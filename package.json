@@ -4,10 +4,14 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    
+    "dev": "pnpm -C apps/app-vue dev"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "packageManager": "pnpm@10.13.0"
+  "packageManager": "pnpm@10.13.0",
+  "dependencies": {
+    "@ai-sdk/ai-core": "workspace:*",
+    "vue": "^3.5.25"
+  }
 }
