@@ -1,0 +1,20 @@
+{
+  "name": "@tsc-base-fe/ai-core",
+  "version": "1.0.0",
+  "description": "AI核心能力封装，支持流式输出和多模型对接",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc -b tsconfig.json",
+    "dev": "tsc -b tsconfig.json --watch"
+  },
+  "dependencies": {
+    "axios": "^1.6.7"
+  },
+  "devDependencies": {
+    "typescript": "^5.2.2"
+  },
+  "keywords": ["ai", "stream", "chat", "openai", "sse"],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.13.0"
+}

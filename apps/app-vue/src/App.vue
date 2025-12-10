@@ -3,7 +3,6 @@
     <div class="sidebar">
       <div class="sidebar-header">
         <div class="logo">
-          <span class="logo-icon">🤖</span>
           <h2>AI Chat Demo</h2>
         </div>
         <div class="version">v1.0.0</div>
@@ -14,29 +13,8 @@
           <span class="nav-icon">💬</span>
           <span class="nav-text">对话演示</span>
         </router-link>
-        <router-link to="/test" class="nav-item">
-          <span class="nav-icon">🧪</span>
-          <span class="nav-text">完整测试</span>
-        </router-link>
-        <router-link to="/docs" class="nav-item">
-          <span class="nav-icon">📚</span>
-          <span class="nav-text">文档</span>
-        </router-link>
-        <router-link to="/config" class="nav-item">
-          <span class="nav-icon">⚙️</span>
-          <span class="nav-text">配置</span>
-        </router-link>
       </nav>
-      
-      <div class="sidebar-footer">
-        <div class="status-indicator">
-          <span class="status-dot connected"></span>
-          <span class="status-text">服务正常</span>
-        </div>
-        <div class="timestamp">最后更新: {{ currentTime }}</div>
-      </div>
     </div>
-    
     <div class="main-content">
       <router-view></router-view>
     </div>

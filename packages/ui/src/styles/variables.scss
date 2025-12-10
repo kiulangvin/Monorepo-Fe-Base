@@ -1,0 +1,82 @@
+// AI 聊天组件样式变量
+
+// 主色调
+$primary-color: #1890ff !default;
+$primary-hover: #40a9ff !default;
+$primary-active: #096dd9 !default;
+
+// 文字颜色
+$text-primary: #262626 !default;
+$text-secondary: #8c8c8c !default;
+$text-disabled: #bfbfbf !default;
+
+// 背景颜色
+$bg-primary: #ffffff !default;
+$bg-secondary: #f5f5f5 !default;
+$bg-hover: #fafafa !default;
+
+// 边框颜色
+$border-color: #d9d9d9 !default;
+$border-radius: 4px !default;
+$border-radius-large: 8px !default;
+
+// 阴影
+$shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !default;
+$shadow-hover: 0 4px 16px rgba(0, 0, 0, 0.15) !default;
+
+// 消息气泡颜色
+$user-bubble-bg: #e6f7ff !default;
+$assistant-bubble-bg: #f5f5f5 !default;
+
+// 加载动画
+$loading-dot-size: 8px !default;
+$loading-animation-duration: 1.4s !default;
+
+// 深色模式变量
+$dark-bg-primary: #141414 !default;
+$dark-bg-secondary: #242424 !default;
+$dark-text-primary: #f5f5f5 !default;
+$dark-text-secondary: #a0a0a0 !default;
+$dark-border-color: #333333 !default;
+$dark-user-bubble-bg: #1a293f !default;
+$dark-assistant-bubble-bg: #2d2d2d !default;
+
+// 间距
+$spacing-xs: 4px !default;
+$spacing-sm: 8px !default;
+$spacing-md: 16px !default;
+$spacing-lg: 24px !default;
+$spacing-xl: 32px !default;
+
+// 字体大小
+$font-size-xs: 12px !default;
+$font-size-sm: 14px !default;
+$font-size-md: 16px !default;
+$font-size-lg: 18px !default;
+$font-size-xl: 20px !default;
+
+// 行高
+$line-height-base: 1.5 !default;
+$line-height-large: 1.8 !default;
+
+// 过渡动画
+$transition-fast: 0.2s ease !default;
+$transition-normal: 0.3s ease !default;
+$transition-slow: 0.5s ease !default;
+
+// 响应式断点
+$breakpoint-sm: 576px !default;
+$breakpoint-md: 768px !default;
+$breakpoint-lg: 992px !default;
+$breakpoint-xl: 1200px !default;
+
+// 头像尺寸
+$avatar-size-sm: 32px !default;
+$avatar-size-md: 40px !default;
+$avatar-size-lg: 48px !default;
+
+// 输入框高度
+$input-height: 40px !default;
+
+// 最大消息宽度
+$message-max-width: 80% !default;
