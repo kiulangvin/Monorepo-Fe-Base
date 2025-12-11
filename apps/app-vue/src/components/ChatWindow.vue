@@ -21,7 +21,7 @@
             <span class="message-time">{{ formatTime(message.timestamp || Date.now()) }}</span>
           </div>
           <div class="message-content" :class="message.role">
-            {{ message.content }}
+             <div v-html="message.content"></div>
           </div>
         </div>
         <div v-if="isProcessing" class="loading">
@@ -60,8 +60,10 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, watch } from 'vue';
-import { ModelType,type ModelConfig, ModelFactory, type StreamCallbacks, type StreamChunk, 
-  type ChatMessage, type ModelService } from '@tsc-base-fe/ai-core';
+import { md } from './useMarkdownIt';
+
+import { ModelType, ModelFactory} from '@tsc-base-fe/ai-core';
+import type {  ModelConfig,  StreamCallbacks,  StreamChunk, ChatMessage,  ModelService } from '@tsc-base-fe/ai-core';
 
 // 消息容器引用，用于自动滚动
 const messagesContainer = ref<HTMLElement>();
@@ -230,7 +232,7 @@ const handleSend = async () => {
       timestamp: Date.now()
     };
     chatHistory.value.push(aiMessage);
-    
+    const contentSource = ref('');
     // 定义流式回调函数
     const callbacks: StreamCallbacks = {
       onStart: () => {
@@ -245,7 +247,9 @@ const handleSend = async () => {
           if (contentToAdd) {
             console.log('添加内容:', contentToAdd.length, '字符');
             // 强制Vue响应式更新
-            aiMessage.content += contentToAdd;
+            // aiMessage.content += contentToAdd;
+            contentSource.value += contentToAdd;
+            aiMessage.content = md.render(contentSource.value);
             // 在Vue 3中，有时需要强制重新渲染，这里使用下一个宏任务来确保更新
             setTimeout(() => {
               // 重新触发响应式

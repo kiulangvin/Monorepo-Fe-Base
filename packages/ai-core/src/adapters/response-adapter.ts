@@ -73,7 +73,7 @@ export class CustomApiResponseAdapter implements ResponseAdapter {
       
       // 根据自定义API返回的格式进行适配
       return {
-        eventType: parsed.type || EventTypeEnum.TEXT,
+        eventType: parsed.eventType || EventTypeEnum.TEXT,
         eventSn: parsed.sn || chunkIndex,
         content: {
           text: parsed.content || '',

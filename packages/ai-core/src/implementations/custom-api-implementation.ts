@@ -164,6 +164,14 @@ export class CustomApiImplementation extends BaseModelService {
       let chunkIndex = 0;
       let buffer = '';
       
+      // 确保首先发送开始事件
+      yield {
+        eventType: 'START',
+        eventSn: chunkIndex++,
+        content: { text: '' },
+        metadata: { real: true }
+      };
+      
       // 开始读取流式响应
       while (true) {
         // 检查是否被取消
@@ -186,9 +194,45 @@ export class CustomApiImplementation extends BaseModelService {
         for (let i = 0; i < lines.length - 1; i++) {
           const line = lines[i].trim();
           if (line) {
-            const adaptedChunk = this.responseAdapter.adaptStreamChunk(line, chunkIndex++);
-            if (adaptedChunk) {
-              yield adaptedChunk;
+            try {
+              // 尝试直接解析JSON（如果服务器返回的是JSON格式）
+              let parsedData;
+              try {
+                parsedData = JSON.parse(line);
+              } catch (e) {
+                // 如果不是直接的JSON，尝试提取data部分（SSE格式）
+                if (line.startsWith('data:')) {
+                  const dataPart = line.substring(5).trim();
+                  parsedData = JSON.parse(dataPart);
+                } else {
+                  // 如果无法解析，使用适配器
+                  const adaptedChunk = this.responseAdapter.adaptStreamChunk(line, chunkIndex++);
+                  if (adaptedChunk) {
+                    yield adaptedChunk;
+                  }
+                  continue;
+                }
+              }
+              
+              // 处理解析后的数据，确保符合StreamChunk格式
+              if (parsedData && typeof parsedData === 'object') {
+                // 确保包含必要的字段
+                const streamChunk: StreamChunk = {
+                  eventType: parsedData.eventType || 'TEXT',
+                  eventSn: chunkIndex++,
+                  content: parsedData.content || { text: parsedData.text || '' },
+                  metadata: parsedData.metadata || { real: true }
+                };
+                
+                yield streamChunk;
+              }
+            } catch (parseError) {
+              console.warn('Error parsing stream chunk:', parseError);
+              // 使用适配器作为后备方案
+              const adaptedChunk = this.responseAdapter.adaptStreamChunk(line, chunkIndex++);
+              if (adaptedChunk) {
+                yield adaptedChunk;
+              }
             }
           }
         }
@@ -199,9 +243,44 @@ export class CustomApiImplementation extends BaseModelService {
       
       // 处理剩余的缓冲区内容
       if (buffer.trim()) {
-        const adaptedChunk = this.responseAdapter.adaptStreamChunk(buffer, chunkIndex++);
-        if (adaptedChunk) {
-          yield adaptedChunk;
+        try {
+          // 尝试解析剩余内容
+          let parsedData;
+          try {
+            parsedData = JSON.parse(buffer);
+          } catch (e) {
+            // 尝试提取data部分
+            if (buffer.startsWith('data:')) {
+              const dataPart = buffer.substring(5).trim();
+              parsedData = JSON.parse(dataPart);
+            } else {
+              // 使用适配器
+              const adaptedChunk = this.responseAdapter.adaptStreamChunk(buffer, chunkIndex++);
+              if (adaptedChunk) {
+                yield adaptedChunk;
+              }
+              return;
+            }
+          }
+          
+          // 处理解析后的数据
+          if (parsedData && typeof parsedData === 'object') {
+            const streamChunk: StreamChunk = {
+              eventType: parsedData.eventType || 'TEXT',
+              eventSn: chunkIndex++,
+              content: parsedData.content || { text: parsedData.text || '' },
+              metadata: parsedData.metadata || { real: true }
+            };
+            
+            yield streamChunk;
+          }
+        } catch (parseError) {
+          console.warn('Error parsing remaining buffer:', parseError);
+          // 使用适配器
+          const adaptedChunk = this.responseAdapter.adaptStreamChunk(buffer, chunkIndex++);
+          if (adaptedChunk) {
+            yield adaptedChunk;
+          }
         }
       }
       
@@ -264,7 +343,126 @@ export class CustomApiImplementation extends BaseModelService {
       metadata: { mock: true }
     };
     
-    // 逐字符发送内容
+    // 模拟多组反复调用的场景
+    // 场景1: 工具调用
+    yield {
+      eventType: 'TOOL_START',
+      eventSn: eventSn++,
+      content: { text: '开始调用工具...' },
+      metadata: { mock: true, toolName: 'search' }
+    };
+    
+    await new Promise(resolve => setTimeout(resolve, delay * 2));
+    
+    yield {
+      eventType: 'TOOL',
+      eventSn: eventSn++,
+      content: { 
+        text: '搜索关键词: 前端开发',
+        toolName: 'search',
+        parameters: { query: '前端开发最新技术' }
+      },
+      metadata: { mock: true }
+    };
+    
+    await new Promise(resolve => setTimeout(resolve, delay * 3));
+    
+    yield {
+      eventType: 'TOOL_END',
+      eventSn: eventSn++,
+      content: { 
+        text: '工具调用完成',
+        result: '找到了相关前端开发技术信息'
+      },
+      metadata: { mock: true, success: true }
+    };
+    
+    // 场景2: 思考过程
+    await new Promise(resolve => setTimeout(resolve, delay));
+    
+    yield {
+      eventType: 'THINK',
+      eventSn: eventSn++,
+      content: { 
+        text: '根据搜索结果，我需要整理前端开发的最新信息'
+      },
+      metadata: { mock: true }
+    };
+    
+    // 场景3: 再次工具调用
+    await new Promise(resolve => setTimeout(resolve, delay * 2));
+    
+    yield {
+      eventType: 'TOOL_START',
+      eventSn: eventSn++,
+      content: { text: '开始调用工具...' },
+      metadata: { mock: true, toolName: 'code_generator' }
+    };
+    
+    await new Promise(resolve => setTimeout(resolve, delay * 2));
+    
+    yield {
+      eventType: 'TOOL',
+      eventSn: eventSn++,
+      content: { 
+        text: '生成示例代码',
+        toolName: 'code_generator',
+        parameters: { language: 'javascript', task: 'create a simple component' }
+      },
+      metadata: { mock: true }
+    };
+    
+    await new Promise(resolve => setTimeout(resolve, delay * 3));
+    
+    yield {
+      eventType: 'TOOL_END',
+      eventSn: eventSn++,
+      content: { 
+        text: '代码生成完成',
+        result: '生成了一个简单的JavaScript组件'
+      },
+      metadata: { mock: true, success: true }
+    };
+    
+    // 场景4: 图表生成
+    await new Promise(resolve => setTimeout(resolve, delay));
+    
+    yield {
+      eventType: 'ECHARTS_START',
+      eventSn: eventSn++,
+      content: { text: '开始生成图表...' },
+      metadata: { mock: true, chartType: 'bar' }
+    };
+    
+    await new Promise(resolve => setTimeout(resolve, delay * 2));
+    
+    yield {
+      eventType: 'ECHARTS',
+      eventSn: eventSn++,
+      content: { 
+        text: '图表配置',
+        chartOption: {
+          title: { text: '前端技术使用情况' },
+          type: 'bar',
+          data: [60, 40, 80, 75, 90]
+        }
+      },
+      metadata: { mock: true }
+    };
+    
+    await new Promise(resolve => setTimeout(resolve, delay));
+    
+    yield {
+      eventType: 'ECHARTS_END',
+      eventSn: eventSn++,
+      content: { text: '图表生成完成' },
+      metadata: { mock: true, success: true }
+    };
+    
+    // 场景5: 最终回答文本
+    await new Promise(resolve => setTimeout(resolve, delay));
+    
+    // 逐字符发送最终回答内容
     for (let i = 0; i < words.length; i++) {
       // 检查是否被取消
       if (this.abortController?.signal.aborted) {
