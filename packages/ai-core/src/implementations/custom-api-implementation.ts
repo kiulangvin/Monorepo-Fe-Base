@@ -44,12 +44,6 @@ export class CustomApiImplementation extends BaseModelService {
   }
 
   /**
-   * 发送非流式请求
-   * @param messages 对话消息列表
-   * @returns Promise<AdaptedResponse> 适配后的响应
-   */
-  
-  /**
    * 实现基类要求的streamRequest方法
    * @param messages 对话消息列表
    * @param callbacks 流式回调函数
@@ -78,6 +72,12 @@ export class CustomApiImplementation extends BaseModelService {
       this.setProcessing(false);
     }
   }
+  
+  /**
+   * 发送非流式请求
+   * @param messages 对话消息列表
+   * @returns Promise<AdaptedResponse> 适配后的响应
+   */
   public async request(messages: ChatMessage[]): Promise<AdaptedResponse> {
     try {
       this.setProcessing(true);

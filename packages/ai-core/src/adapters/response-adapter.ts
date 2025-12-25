@@ -162,6 +162,9 @@ export class ResponseAdapterFactory {
     // 注册默认适配器
     ResponseAdapterFactory.adapters.set(ModelType.CUSTOM, new CustomApiResponseAdapter());
     ResponseAdapterFactory.adapters.set(ModelType.DEEPSEEK, new DeepseekResponseAdapter());
+    // 可以根据需要添加其他模型类型的适配器
+    TODO: 'Add adapters for other model types'
+    // ResponseAdapterFactory.adapters.set(ModelType.OPENAI, new OpenaiResponseAdapter()); 
   }
 
   /**
